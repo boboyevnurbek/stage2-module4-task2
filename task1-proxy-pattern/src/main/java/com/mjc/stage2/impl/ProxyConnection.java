@@ -3,6 +3,9 @@ package com.mjc.stage2.impl;
 
 import com.mjc.stage2.Connection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProxyConnection implements Connection {
     private RealConnection realConnection;
 
@@ -14,10 +17,16 @@ public class ProxyConnection implements Connection {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         int n = connectionPool.getFreeConnectionsCount();
 
+        List<Connection> connections = new ArrayList<>();
+
         for (int i = 0; i < n; i++) {
             Connection connection = connectionPool.getConnection();
             connection.close();
-            connectionPool.releaseConnection(connection);
+            connections.add(connection);
+        }
+
+        for (int i = 0; i < n; i++) {
+            connectionPool.releaseConnection(connections.get(i));
         }
     }
 
