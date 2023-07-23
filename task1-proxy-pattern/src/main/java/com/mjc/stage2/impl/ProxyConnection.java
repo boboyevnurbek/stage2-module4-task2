@@ -12,15 +12,17 @@ public class ProxyConnection implements Connection {
 
     public void reallyClose() {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = connectionPool.getConnection();
-        if(connection.isClosed()){
+        while (connectionPool.getUsedConnectionsCount() != 0) {
+            Connection connection = connectionPool.getConnection();
             connectionPool.releaseConnection(connection);
         }
     }
 
     @Override
     public void close() {
-        realConnection.close();
+        if (!realConnection.isClosed()) {
+            realConnection.close();
+        }
     }
 
     @Override
