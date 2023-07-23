@@ -12,9 +12,12 @@ public class ProxyConnection implements Connection {
 
     public void reallyClose() {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
-        while (connectionPool.getFreeConnectionsCount() != 0) {
+        int n = connectionPool.getFreeConnectionsCount();
+
+        for (int i = 0; i < n; i++) {
             Connection connection = connectionPool.getConnection();
             connection.close();
+            connectionPool.releaseConnection(connection);
         }
     }
 
